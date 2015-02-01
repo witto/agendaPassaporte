@@ -46,15 +46,13 @@ payload = {
 }
 
 r = s.post("https://www7.dpf.gov.br/sinpa/realizarReagendamento.do", data=payload, verify=False)
-
 tree = html.fromstring(r.content)
-
 postosElem = tree.xpath("//span[@id='postos']/a")
 
 for posto in postosElem:
 	postoId = re.sub(r"[^\d]+", r"", posto.get("href"))
 	postoName = posto.text.strip().split("\n")[0].strip().rstrip("-")
-	print "Posto: %s - %s" % (postoId, postoName)
+	print "\nPosto: %s - %s" % (postoId, postoName)
 
 	payload = {
 		"dispatcher": "exibirInclusaoAgendamento",
@@ -65,8 +63,10 @@ for posto in postosElem:
 	}
 
 	r = s.post("https://www7.dpf.gov.br/sinpa/realizarReagendamento.do", data=payload, verify=False)
-	fp = open("%s_out.html" % (postoId), "w")
-	fp.write(r.content)
-	fp.close()
+	tree = html.fromstring(r.content)
+	datas = tree.xpath("//option")
 
-	break
+	for data in datas:
+		print "%s - %s" % (data.get("value"), data.text)
+
+print
