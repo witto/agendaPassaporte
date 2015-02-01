@@ -9,9 +9,11 @@ POST https://www7.dpf.gov.br/sinpa/realizarReagendamento.do
 dispatcher=exibirInclusaoAgendamento&postoId=1375&validate=false&ufPosto=SP&cidadePosto=7107
 """
 
+import re
 import requests
 import StringIO
 from PIL import Image
+from lxml import html
 
 cpf = raw_input("Digite o CPF:")
 dtNasc = raw_input("Digite a data de nascimento:")
@@ -25,6 +27,7 @@ print "Buscando captcha\n\n\n"
 r = s.get("https://www7.dpf.gov.br/sinpa/jcaptcha.do", verify=False)
 
 im = Image.open(StringIO.StringIO(r.content))
+im.save("captcha.jpg", "JPEG")
 im.show()
 
 captcha = raw_input("Digite o captcha:")
@@ -44,6 +47,26 @@ payload = {
 
 r = s.post("https://www7.dpf.gov.br/sinpa/realizarReagendamento.do", data=payload, verify=False)
 
-fp = open("out.html", "w")
-fp.write(r.content)
-fp.close()
+tree = html.fromstring(r.content)
+
+postosElem = tree.xpath("//span[@id='postos']/a")
+
+for posto in postosElem:
+	postoId = re.sub(r"[^\d]+", r"", posto.get("href"))
+	postoName = posto.text.strip().split("\n")[0].strip().rstrip("-")
+	print "Posto: %s - %s" % (postoId, postoName)
+
+	payload = {
+		"dispatcher": "exibirInclusaoAgendamento",
+		"postoId": postoId,
+		"validate": "false",
+		"ufPosto": "SP",
+		"cidadePosto": "7107"
+	}
+
+	r = s.post("https://www7.dpf.gov.br/sinpa/realizarReagendamento.do", data=payload, verify=False)
+	fp = open("%s_out.html" % (postoId), "w")
+	fp.write(r.content)
+	fp.close()
+
+	break
