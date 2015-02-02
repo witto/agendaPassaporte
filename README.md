@@ -1,4 +1,4 @@
-Pequeno script para monitorar abertura de datas para agendamento de passaporte.
+Pequeno script para monitorar abertura de datas para reagendamento da solicitação de passaporte.
 
 Exemplo de uso:
 
