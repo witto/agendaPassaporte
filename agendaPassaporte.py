@@ -98,6 +98,8 @@ if not s:
 
 print "Sessão iniciada com sucesso.\n"
 
+delay = int(raw_input("Pesquisar a cada quantos minutos? ")) * 60
+
 postos = carregarPostos(cidade["id"])
 
 while True:
@@ -107,8 +109,10 @@ while True:
 		print "Posto %s" % posto["name"]
 		print "Datas disponíveis:"
 		datas = carregarDatas(s, uf, cidade["id"], posto["id"])
+		if (len(datas) == 0):
+			print "Nenhuma no momento"
 		for data in datas:
 			print data.strftime("%d/%m/%Y")
 		print
 	print "\n\n"
-	time.sleep(300)
+	time.sleep(delay)
