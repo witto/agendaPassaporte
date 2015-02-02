@@ -7,6 +7,7 @@ import StringIO
 import random
 import sys
 import time
+import readline
 from PIL import Image
 from lxml import html
 from datetime import datetime
@@ -46,7 +47,7 @@ def iniciarSessao(cpf, dtNasc):
 
 	captcha = raw_input("Digite o captcha:")
 
-	print "Validando captcha"
+	print "Validando dados"
 
 	payload = {
 		"dispatcher": "processarConsultaAgendamento", 
@@ -75,32 +76,29 @@ def carregarDatas(session, uf, cidade, posto):
 
 	r = session.post("https://www7.dpf.gov.br/sinpa/realizarReagendamento.do", data=payload, verify=False)
 	tree = html.fromstring(r.content)
-	#print r.content
 	datas = tree.xpath("//option")
-	print datas[0].get("value")
 	return [parser.parse(x.get("value"), dayfirst=True) for x in datas if len(x.get("value").strip()) > 0]
 
 
 uf = raw_input("Digite seu estado (UF):").upper()
 cidades = carregarMunicipios(uf)
-print cidades[10]
 
 for i in range(0, len(cidades)):
 	print "%2s) %s" % (i+1, cidades[i]["name"])
 
 cidadeIndex = raw_input("Digite o número da cidade: ")
 cidade = cidades[int(cidadeIndex)-1]
-postos = carregarPostos(cidade["id"])
-
 cpf = raw_input("Digite o CPF: ")
 dtNasc = raw_input("Digite a data de nascimento: ")
 
 s = iniciarSessao(cpf, dtNasc)
 if not s:
-	print "Falha ao iniciar sessão"
+	print "Falha ao iniciar sessão. Tente novamente."
 	sys.exit()
 
 print "Sessão iniciada com sucesso.\n"
+
+postos = carregarPostos(cidade["id"])
 
 while True:
 	print datetime.now()
