@@ -111,7 +111,7 @@ while True:
 		datas = carregarDatas(s, uf, cidade["id"], posto["id"])
 		if (len(datas) == 0):
 			print "Nenhuma no momento"
-		for data in datas:
+		for data in datas[:5]:
 			print data.strftime("%d/%m/%Y")
 		print
 	print "\n\n"
